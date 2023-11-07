@@ -1,8 +1,8 @@
 {
     "RefreshRecentMeta": {
-        "name": "自动刷新最近加入媒体元数据",
+        "name": "自动刷新媒体元数据",
         "description": "自动刷新最近n天加入媒体元数据",
-        "version": "1.5",
+        "version": "1.6",
         "icon": "backup.png",
         "color": "#4FB647",
         "author": "dandkong",

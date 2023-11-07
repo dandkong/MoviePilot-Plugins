@@ -15,15 +15,15 @@ from app.utils.http import RequestUtils
 
 class RefreshRecentMeta(_PluginBase):
     # 插件名称
-    plugin_name = "自动刷新最近加入媒体元数据"
+    plugin_name = "自动刷新媒体元数据"
     # 插件描述
-    plugin_desc = "自动刷新最近加入媒体元数据"
+    plugin_desc = "自动刷新最近n天加入的媒体元数据"
     # 插件图标
     plugin_icon = "backup.png"
     # 主题色
     plugin_color = "#4FB647"
     # 插件版本
-    plugin_version = "1.5"
+    plugin_version = "1.6"
     # 插件作者
     plugin_author = "dandkong"
     # 作者主页
