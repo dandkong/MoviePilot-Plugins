@@ -22,7 +22,7 @@ class RefreshRecentMeta(_PluginBase):
     # 主题色
     plugin_color = "#4FB647"
     # 插件版本
-    plugin_version = "1.3"
+    plugin_version = "1.4"
     # 插件作者
     plugin_author = "dandkong"
     # 作者主页
@@ -104,13 +104,6 @@ class RefreshRecentMeta(_PluginBase):
         host = settings.EMBY_HOST
         apikey = settings.EMBY_API_KEY
 
-        logger.info(host)
-        logger.info(apikey)
-        logger.info(self._offset_days)
-        logger.info(self._cron)
-
-        if not host or not apikey:
-            return None
         end_date = self.__get_date(-int(self._offset_days))
         # 获得_offset_day加入的剧集
         req_url = "%semby/Items?IncludeItemTypes=Episode&MinPremiereDate=%s&IsMissing=false&Recursive=true&api_key=%s" % (
