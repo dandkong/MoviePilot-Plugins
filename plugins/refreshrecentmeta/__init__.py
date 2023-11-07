@@ -22,7 +22,7 @@ class RefreshRecentMeta(_PluginBase):
     # 主题色
     plugin_color = "#4FB647"
     # 插件版本
-    plugin_version = "1.4"
+    plugin_version = "1.5"
     # 插件作者
     plugin_author = "dandkong"
     # 作者主页
@@ -246,27 +246,6 @@ class RefreshRecentMeta(_PluginBase):
                                         'props': {
                                             'model': 'offset_days',
                                             'label': '几天内'
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        'component': 'VRow',
-                        'content': [
-                            {
-                                'component': 'VCol',
-                                'props': {
-                                    'cols': 12,
-                                },
-                                'content': [
-                                    {
-                                        'component': 'VAlert',
-                                        'props': {
-                                            'type': 'info',
-                                            'variant': 'tonal',
-                                            'text': '备份文件路径默认为本地映射的config/plugins/AutoBackup。'
                                         }
                                     }
                                 ]
