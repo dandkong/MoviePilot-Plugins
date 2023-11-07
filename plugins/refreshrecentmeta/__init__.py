@@ -102,8 +102,21 @@ class RefreshRecentMeta(_PluginBase):
         logger.info(f"当前时间 {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))} 自动刷新最近加入媒体元数据")
 
         host = settings.EMBY_HOST
+        if host:
+            if not host.endswith("/"):
+                host += "/"
+            if not host.startswith("http"):
+                host = "http://" + host
+
         apikey = settings.EMBY_API_KEY
 
+        logger.info(host)
+        logger.info(apikey)
+        logger.info(self._offset_days)
+        logger.info(self._cron)
+
+        if not host or not apikey:
+            return None
         end_date = self.__get_date(-int(self._offset_days))
         # 获得_offset_day加入的剧集
         req_url = "%semby/Items?IncludeItemTypes=Episode&MinPremiereDate=%s&IsMissing=false&Recursive=true&api_key=%s" % (
