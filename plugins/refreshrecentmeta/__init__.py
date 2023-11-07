@@ -1,20 +1,14 @@
-import glob
-import os
-import shutil
 import time
 from datetime import datetime, timedelta
-from pathlib import Path
 
 import pytz
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 
-from app import schemas
 from app.core.config import settings
 from app.plugins import _PluginBase
 from typing import Any, List, Dict, Tuple, Optional
 from app.log import logger
-from app.schemas import NotificationType
 import datetime
 from app.utils.http import RequestUtils
 
@@ -29,7 +23,7 @@ class RefreshRecentMeta(_PluginBase):
     # 主题色
     plugin_color = "#4FB647"
     # 插件版本
-    plugin_version = "1.0"
+    plugin_version = "1.1"
     # 插件作者
     plugin_author = "dandkong"
     # 作者主页
