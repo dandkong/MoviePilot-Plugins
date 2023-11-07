@@ -66,7 +66,7 @@ class RefreshRecentMeta(_PluginBase):
                 try:
                     self._scheduler.add_job(func=self.__refresh_recent,
                                             trigger=CronTrigger.from_crontab(self._cron),
-                                            name="自动刷新最近加入媒体元数据")
+                                            name="自动刷新媒体元数据")
                 except Exception as err:
                     logger.error(f"定时任务配置错误：{str(err)}")
 
@@ -74,7 +74,7 @@ class RefreshRecentMeta(_PluginBase):
                 logger.info(f"自动刷新最近媒体元数据服务启动，立即运行一次")
                 self._scheduler.add_job(func=self.__refresh_recent, trigger='date',
                                         run_date=datetime.now(tz=pytz.timezone(settings.TZ)) + timedelta(seconds=3),
-                                        name="自动刷新最近加入媒体元数据")
+                                        name="自动刷新媒体元数据")
                 # 关闭一次性开关
                 self._onlyonce = False
                 self.update_config({
@@ -101,7 +101,7 @@ class RefreshRecentMeta(_PluginBase):
             return
 
         logger.info(
-            f"当前时间 {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))} 自动刷新最近加入媒体元数据")
+            f"当前时间 {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))} 自动刷新媒体元数据")
 
         host = settings.EMBY_HOST
         if host:
@@ -145,7 +145,7 @@ class RefreshRecentMeta(_PluginBase):
         if self._notify:
             self.post_message(
                 mtype=NotificationType.SiteMessage,
-                title="【自动刷新最近加入媒体元数据完成】",
+                title="【自动刷新媒体元数据完成】",
                 text="成功刷新")
 
     def get_state(self) -> bool:
