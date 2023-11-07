@@ -17,11 +17,11 @@ from app.log import logger
 from app.schemas import NotificationType
 
 
-class AutoBackup(_PluginBase):
+class RefreshRecentMeta(_PluginBase):
     # 插件名称
-    plugin_name = "自动备份"
+    plugin_name = "自动刷新最近媒体元数据"
     # 插件描述
-    plugin_desc = "自动备份数据和配置文件。"
+    plugin_desc = "自动刷新最近媒体元数据"
     # 插件图标
     plugin_icon = "backup.png"
     # 主题色
@@ -29,11 +29,11 @@ class AutoBackup(_PluginBase):
     # 插件版本
     plugin_version = "1.0"
     # 插件作者
-    plugin_author = "thsrite"
+    plugin_author = "dandkong"
     # 作者主页
-    author_url = "https://github.com/thsrite"
+    author_url = "https://github.com/dandkong"
     # 插件配置项ID前缀
-    plugin_config_prefix = "autobackup_"
+    plugin_config_prefix = "refreshrecentmeta_"
     # 加载顺序
     plugin_order = 17
     # 可使用的用户级别
