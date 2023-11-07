@@ -23,7 +23,7 @@ class RefreshRecentMeta(_PluginBase):
     # 主题色
     plugin_color = "#4FB647"
     # 插件版本
-    plugin_version = "1.6"
+    plugin_version = "1.7"
     # 插件作者
     plugin_author = "dandkong"
     # 作者主页
@@ -112,6 +112,8 @@ class RefreshRecentMeta(_PluginBase):
 
         apikey = settings.EMBY_API_KEY
 
+        success = False
+
         if not host or not apikey:
             return None
         end_date = self.__get_date(-int(self._offset_days))
@@ -123,6 +125,7 @@ class RefreshRecentMeta(_PluginBase):
             if res:
                 res_items = res.json().get("Items")
                 if res_items:
+                    success = True
                     for res_item in res_items:
                         item_id = res_item.get('Id')
                         series_name = res_item.get('SeriesName')
@@ -143,10 +146,16 @@ class RefreshRecentMeta(_PluginBase):
 
         # 发送通知
         if self._notify:
-            self.post_message(
-                mtype=NotificationType.SiteMessage,
-                title="【自动刷新媒体元数据完成】",
-                text="成功刷新")
+            if success:
+                self.post_message(
+                    mtype=NotificationType.SiteMessage,
+                    title="【自动刷新媒体元数据完成】",
+                    text=f"成功刷新最近{self._offset_days}天媒体元数据")
+            else:
+                self.post_message(
+                    mtype=NotificationType.SiteMessage,
+                    title="【自动刷新媒体元数据失败】",
+                    text="请查看日志")
 
     def get_state(self) -> bool:
         return self._enabled
