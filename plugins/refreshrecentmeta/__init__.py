@@ -22,7 +22,7 @@ class RefreshRecentMeta(_PluginBase):
     # 主题色
     plugin_color = "#4FB647"
     # 插件版本
-    plugin_version = "1.2"
+    plugin_version = "1.3"
     # 插件作者
     plugin_author = "dandkong"
     # 作者主页
@@ -99,11 +99,16 @@ class RefreshRecentMeta(_PluginBase):
         if "emby" not in settings.MEDIASERVER:
             return
 
-        logger.info(
-            f"当前时间 {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))} 自动刷新最近加入媒体元数据")
+        logger.info(f"当前时间 {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))} 自动刷新最近加入媒体元数据")
 
         host = settings.EMBY_HOST
         apikey = settings.EMBY_API_KEY
+
+        logger.info(host)
+        logger.info(apikey)
+        logger.info(self._offset_days)
+        logger.info(self._cron)
+
         if not host or not apikey:
             return None
         end_date = self.__get_date(-int(self._offset_days))
