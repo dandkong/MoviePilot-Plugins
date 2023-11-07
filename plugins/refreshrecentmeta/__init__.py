@@ -9,7 +9,6 @@ from app.core.config import settings
 from app.plugins import _PluginBase
 from typing import Any, List, Dict, Tuple, Optional
 from app.log import logger
-import datetime
 from app.utils.http import RequestUtils
 
 
@@ -23,7 +22,7 @@ class RefreshRecentMeta(_PluginBase):
     # 主题色
     plugin_color = "#4FB647"
     # 插件版本
-    plugin_version = "1.1"
+    plugin_version = "1.2"
     # 插件作者
     plugin_author = "dandkong"
     # 作者主页
@@ -91,8 +90,8 @@ class RefreshRecentMeta(_PluginBase):
                 self._scheduler.start()
 
     def __get_date(self, offset_day):
-        now_time = datetime.datetime.now()
-        end_time = now_time + datetime.timedelta(days=offset_day)
+        now_time = datetime.now()
+        end_time = now_time + timedelta(days=offset_day)
         end_date = end_time.strftime("%Y-%m-%d")
         return end_date
 
