@@ -9,6 +9,7 @@ from app.core.config import settings
 from app.plugins import _PluginBase
 from typing import Any, List, Dict, Tuple, Optional
 from app.log import logger
+from app.schemas import NotificationType
 from app.utils.http import RequestUtils
 
 
@@ -99,7 +100,8 @@ class RefreshRecentMeta(_PluginBase):
         if "emby" not in settings.MEDIASERVER:
             return
 
-        logger.info(f"当前时间 {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))} 自动刷新最近加入媒体元数据")
+        logger.info(
+            f"当前时间 {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))} 自动刷新最近加入媒体元数据")
 
         host = settings.EMBY_HOST
         if host:
@@ -109,11 +111,6 @@ class RefreshRecentMeta(_PluginBase):
                 host = "http://" + host
 
         apikey = settings.EMBY_API_KEY
-
-        logger.info(host)
-        logger.info(apikey)
-        logger.info(self._offset_days)
-        logger.info(self._cron)
 
         if not host or not apikey:
             return None
@@ -143,6 +140,13 @@ class RefreshRecentMeta(_PluginBase):
                             logger.error(f"连接Items/Id/Refresh出错：" + str(e))
         except Exception as e:
             logger.error(f"连接Items出错：" + str(e))
+
+        # 发送通知
+        if self._notify:
+            self.post_message(
+                mtype=NotificationType.SiteMessage,
+                title="【自动刷新最近加入媒体元数据完成】",
+                text="成功刷新")
 
     def get_state(self) -> bool:
         return self._enabled
