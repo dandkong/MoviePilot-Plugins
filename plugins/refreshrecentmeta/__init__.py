@@ -23,7 +23,7 @@ class RefreshRecentMeta(_PluginBase):
     # 主题色
     plugin_color = "#4FB647"
     # 插件版本
-    plugin_version = "2.0"
+    plugin_version = "2.1"
     # 插件作者
     plugin_author = "dandkong"
     # 作者主页
@@ -154,12 +154,12 @@ class RefreshRecentMeta(_PluginBase):
             if success:
                 self.post_message(
                     mtype=NotificationType.SiteMessage,
-                    title=f"【自动刷新{self.offset_day}天剧集元数据完成】",
+                    title=f"【自动刷新{self._offset_days}天剧集元数据完成】",
                     text=content)
             else:
                 self.post_message(
                     mtype=NotificationType.SiteMessage,
-                    title="【自动刷新剧集元数据失败】",
+                    title=f"【自动刷新{self._offset_days}天剧集元数据完成】",
                     text="请查看日志")
 
     def get_state(self) -> bool:
