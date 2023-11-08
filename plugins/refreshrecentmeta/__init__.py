@@ -15,15 +15,15 @@ from app.utils.http import RequestUtils
 
 class RefreshRecentMeta(_PluginBase):
     # 插件名称
-    plugin_name = "自动刷新媒体元数据"
+    plugin_name = "自动刷新剧集元数据"
     # 插件描述
-    plugin_desc = "自动刷新最近n天加入的媒体元数据"
+    plugin_desc = "自动刷新最近发布剧集元数据"
     # 插件图标
     plugin_icon = "backup.png"
     # 主题色
     plugin_color = "#4FB647"
     # 插件版本
-    plugin_version = "1.7"
+    plugin_version = "1.8"
     # 插件作者
     plugin_author = "dandkong"
     # 作者主页
@@ -66,15 +66,15 @@ class RefreshRecentMeta(_PluginBase):
                 try:
                     self._scheduler.add_job(func=self.__refresh_recent,
                                             trigger=CronTrigger.from_crontab(self._cron),
-                                            name="自动刷新媒体元数据")
+                                            name="自动刷新剧集元数据")
                 except Exception as err:
                     logger.error(f"定时任务配置错误：{str(err)}")
 
             if self._onlyonce:
-                logger.info(f"自动刷新最近媒体元数据服务启动，立即运行一次")
+                logger.info(f"自动刷新最近剧集元数据服务启动，立即运行一次")
                 self._scheduler.add_job(func=self.__refresh_recent, trigger='date',
                                         run_date=datetime.now(tz=pytz.timezone(settings.TZ)) + timedelta(seconds=3),
-                                        name="自动刷新媒体元数据")
+                                        name="自动刷新剧集元数据")
                 # 关闭一次性开关
                 self._onlyonce = False
                 self.update_config({
@@ -101,7 +101,7 @@ class RefreshRecentMeta(_PluginBase):
             return
 
         logger.info(
-            f"当前时间 {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))} 自动刷新媒体元数据")
+            f"当前时间 {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))} 自动刷新剧集元数据")
 
         host = settings.EMBY_HOST
         if host:
@@ -149,12 +149,12 @@ class RefreshRecentMeta(_PluginBase):
             if success:
                 self.post_message(
                     mtype=NotificationType.SiteMessage,
-                    title="【自动刷新媒体元数据完成】",
-                    text=f"成功刷新最近{self._offset_days}天媒体元数据")
+                    title="【自动刷新剧集元数据完成】",
+                    text=f"成功刷新最近{self._offset_days}天剧集元数据")
             else:
                 self.post_message(
                     mtype=NotificationType.SiteMessage,
-                    title="【自动刷新媒体元数据失败】",
+                    title="【自动刷新剧集元数据失败】",
                     text="请查看日志")
 
     def get_state(self) -> bool:
