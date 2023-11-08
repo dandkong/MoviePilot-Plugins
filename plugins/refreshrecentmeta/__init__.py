@@ -154,7 +154,7 @@ class RefreshRecentMeta(_PluginBase):
             if success:
                 self.post_message(
                     mtype=NotificationType.SiteMessage,
-                    title="【自动刷新剧集元数据完成】",
+                    title=f"【自动刷新{self.offset_day}天剧集元数据完成】",
                     text=content)
             else:
                 self.post_message(
