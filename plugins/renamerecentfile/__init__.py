@@ -131,10 +131,9 @@ class RenameRecentFile(_PluginBase):
             if res:
                 res_items = res.json().get("Items")
                 if res_items:
-                    success = True
                     for res_item in res_items:
                         path = res_item.get('Path')
-                        self.__rename(path)
+                        success = success or self.__rename(path)
         except Exception as e:
             logger.error(f"连接Items出错：" + str(e))
 
@@ -143,12 +142,12 @@ class RenameRecentFile(_PluginBase):
             if success:
                 self.post_message(
                     mtype=NotificationType.SiteMessage,
-                    title=f"【自动重命名{self._offset_days}天媒体文件】",
+                    title=f"【自动重命名最近{self._offset_days}天媒体文件】",
                     text="刷新成功")
             else:
                 self.post_message(
                     mtype=NotificationType.SiteMessage,
-                    title=f"【自动重命名{self._offset_days}天媒体文件】",
+                    title=f"【自动重命名最近{self._offset_days}天媒体文件】",
                     text="刷新失败，请查看日志")
 
     def __rename(self, path: str):
@@ -172,7 +171,8 @@ class RenameRecentFile(_PluginBase):
                                                             episodes_info=episodes_info)
         if not transferinfo:
             logger.error("文件转移模块运行失败")
-            return
+            return False
+        return True
 
     def get_state(self) -> bool:
         return self._enabled

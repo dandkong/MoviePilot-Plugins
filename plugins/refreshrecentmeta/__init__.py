@@ -149,12 +149,12 @@ class RefreshRecentMeta(_PluginBase):
             if success:
                 self.post_message(
                     mtype=NotificationType.SiteMessage,
-                    title=f"【自动刷新{self._offset_days}天剧集元数据】",
+                    title=f"【自动刷新最近{self._offset_days}天剧集元数据】",
                     text="刷新成功")
             else:
                 self.post_message(
                     mtype=NotificationType.SiteMessage,
-                    title=f"【自动刷新{self._offset_days}天剧集元数据】",
+                    title=f"【自动刷新最近{self._offset_days}天剧集元数据】",
                     text="刷新失败，请查看日志")
 
     def get_state(self) -> bool:
