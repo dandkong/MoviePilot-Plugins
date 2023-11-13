@@ -8,6 +8,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 from pathlib import Path
 
+from app.chain.tmdb import TmdbChain
 from app.core.config import settings
 from app.plugins import _PluginBase
 from typing import Any, List, Dict, Tuple, Optional
@@ -54,7 +55,7 @@ class RenameRecentFile(_PluginBase):
     def init_plugin(self, config: dict = None):
         # 停止现有任务
         self.stop_service()
-
+        self.tmdbchain = TmdbChain()
         if config:
             self._enabled = config.get("enabled")
             self._cron = config.get("cron")
