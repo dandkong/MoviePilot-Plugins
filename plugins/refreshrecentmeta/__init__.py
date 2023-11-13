@@ -23,7 +23,7 @@ class RefreshRecentMeta(_PluginBase):
     # 主题色
     plugin_color = "#4FB647"
     # 插件版本
-    plugin_version = "2.2"
+    plugin_version = "1.0"
     # 插件作者
     plugin_author = "dandkong"
     # 作者主页
@@ -113,7 +113,6 @@ class RefreshRecentMeta(_PluginBase):
         apikey = settings.EMBY_API_KEY
 
         success = False
-        content = None
 
         if not host or not apikey:
             return None
@@ -138,10 +137,6 @@ class RefreshRecentMeta(_PluginBase):
                             res = RequestUtils().post_res(req_url)
                             if res:
                                 logger.info(f"刷新元数据：{series_name} - {name}")
-                                if content:
-                                    content = content + f"\n{series_name} - {name}"
-                                else:
-                                    content = f"{series_name} - {name}"
                             else:
                                 logger.error(f"刷新媒体库对象 {item_id} 失败，无法连接Emby！")
                         except Exception as e:
@@ -155,7 +150,7 @@ class RefreshRecentMeta(_PluginBase):
                 self.post_message(
                     mtype=NotificationType.SiteMessage,
                     title=f"【自动刷新{self._offset_days}天剧集元数据】",
-                    text=content)
+                    text="刷新成功")
             else:
                 self.post_message(
                     mtype=NotificationType.SiteMessage,

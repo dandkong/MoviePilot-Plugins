@@ -2,7 +2,7 @@
     "RefreshRecentMeta": {
         "name": "自动刷新剧集元数据",
         "description": "自动刷新最近发布剧集元数据",
-        "version": "2.2",
+        "version": "1.0",
         "icon": "backup.png",
         "color": "#4FB647",
         "author": "dandkong",
