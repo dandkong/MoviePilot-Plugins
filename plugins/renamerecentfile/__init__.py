@@ -151,6 +151,7 @@ class RenameRecentFile(_PluginBase):
                     text="刷新失败，请查看日志")
 
     def __rename(self, path: str):
+        logger.info(f"尝试更新文件名：{path}")
         file_path = Path(path.replace("data","downloads"))
         file_meta = MetaInfoPath(file_path)
         # 识别媒体信息
