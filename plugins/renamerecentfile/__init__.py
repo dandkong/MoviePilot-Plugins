@@ -118,8 +118,6 @@ class RenameRecentFile(_PluginBase):
 
         apikey = settings.EMBY_API_KEY
 
-        success = False
-
         if not host or not apikey:
             return None
         end_date = self.__get_date(-int(self._offset_days))
@@ -133,22 +131,17 @@ class RenameRecentFile(_PluginBase):
                 if res_items:
                     for res_item in res_items:
                         path = res_item.get('Path')
-                        success = success or self.__rename(path)
+                        self.__rename(path)
         except Exception as e:
             logger.error(f"连接Items出错：" + str(e))
 
         # 发送通知
         if self._notify:
-            if success:
-                self.post_message(
-                    mtype=NotificationType.SiteMessage,
-                    title=f"【自动重命名最近{self._offset_days}天媒体文件】",
-                    text="刷新成功")
-            else:
-                self.post_message(
-                    mtype=NotificationType.SiteMessage,
-                    title=f"【自动重命名最近{self._offset_days}天媒体文件】",
-                    text="刷新失败，请查看日志")
+            self.post_message(
+                mtype=NotificationType.SiteMessage,
+                title=f"【自动重命名最近{self._offset_days}天媒体文件】",
+                text="刷新成功")
+   
 
     def __rename(self, path: str):
         logger.info(f"尝试更新文件名：{path}")
