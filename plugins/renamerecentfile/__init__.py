@@ -140,7 +140,7 @@ class RenameRecentFile(_PluginBase):
             self.post_message(
                 mtype=NotificationType.SiteMessage,
                 title=f"【自动重命名最近{self._offset_days}天媒体文件】",
-                text="刷新成功")
+                text="执行成功")
    
 
     def __rename(self, path: str):
