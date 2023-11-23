@@ -98,7 +98,6 @@ class RefreshRecentMeta(_PluginBase):
 
     @eventmanager.register(EventType.PluginAction)
     def refresh_recent(self, event: Event = None):
-        logger.info("收到事件~~~~~~~~~~~~~~~~~~~~~~~~~")
         if event:
             event_data = event.event_data
             if not event_data or event_data.get("action") != "refreshrecentmeta":

@@ -7,12 +7,13 @@ import pytz
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 from pathlib import Path
-
+from app.core.event import eventmanager, Event
 from app.chain.tmdb import TmdbChain
 from app.core.config import settings
 from app.plugins import _PluginBase
 from typing import Any, List, Dict, Tuple, Optional
 from app.log import logger
+from app.schemas.types import EventType
 from app.schemas import NotificationType, TransferInfo
 from app.utils.http import RequestUtils
 from app.schemas.types import MediaType
@@ -70,7 +71,7 @@ class RenameRecentFile(_PluginBase):
 
             if self._cron:
                 try:
-                    self._scheduler.add_job(func=self.__refresh_recent,
+                    self._scheduler.add_job(func=self.refresh_recent,
                                             trigger=CronTrigger.from_crontab(self._cron),
                                             name="自动重命名媒体文件")
                 except Exception as err:
@@ -78,7 +79,7 @@ class RenameRecentFile(_PluginBase):
 
             if self._onlyonce:
                 logger.info(f"自动重命名媒体文件服务启动，立即运行一次")
-                self._scheduler.add_job(func=self.__refresh_recent, trigger='date',
+                self._scheduler.add_job(func=self.refresh_recent, trigger='date',
                                         run_date=datetime.now(tz=pytz.timezone(settings.TZ)) + timedelta(seconds=3),
                                         name="自动重命名媒体文件")
                 # 关闭一次性开关
@@ -102,7 +103,13 @@ class RenameRecentFile(_PluginBase):
         end_date = end_time.strftime("%Y-%m-%d")
         return end_date
 
-    def __refresh_recent(self):
+    @eventmanager.register(EventType.PluginAction)
+    def refresh_recent(self, event: Event = None):
+        if event:
+            event_data = event.event_data
+            if not event_data or event_data.get("action") != "renamerecentfile":
+                return
+
         if "emby" not in settings.MEDIASERVER:
             return
 
@@ -173,7 +180,19 @@ class RenameRecentFile(_PluginBase):
 
     @staticmethod
     def get_command() -> List[Dict[str, Any]]:
-        pass
+        """
+        定义远程控制命令
+        :return: 命令关键字、事件、描述、附带数据
+        """
+        return [{
+            "cmd": "/renamerecentfile",
+            "event": EventType.PluginAction,
+            "desc": "重命名最近文件",
+            "category": "",
+            "data": {
+                "action": "renamerecentfile"
+            }
+        }]
 
     def get_api(self) -> List[Dict[str, Any]]:
         pass
