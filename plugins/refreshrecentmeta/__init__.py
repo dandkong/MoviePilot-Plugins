@@ -64,7 +64,7 @@ class RefreshRecentMeta(_PluginBase):
 
             if self._cron:
                 try:
-                    self._scheduler.add_job(func=self.__refresh_recent,
+                    self._scheduler.add_job(func=self.refresh_recent,
                                             trigger=CronTrigger.from_crontab(self._cron),
                                             name="自动刷新剧集元数据")
                 except Exception as err:
@@ -72,7 +72,7 @@ class RefreshRecentMeta(_PluginBase):
 
             if self._onlyonce:
                 logger.info(f"自动刷新最近剧集元数据服务启动，立即运行一次")
-                self._scheduler.add_job(func=self.__refresh_recent, trigger='date',
+                self._scheduler.add_job(func=self.refresh_recent, trigger='date',
                                         run_date=datetime.now(tz=pytz.timezone(settings.TZ)) + timedelta(seconds=3),
                                         name="自动刷新剧集元数据")
                 # 关闭一次性开关
@@ -97,7 +97,7 @@ class RefreshRecentMeta(_PluginBase):
         return end_date
 
     @eventmanager.register(EventType.PluginAction)
-    def __refresh_recent(self, event: Event = None):
+    def refresh_recent(self, event: Event = None):
         logger.info("收到事件~~~~~~~~~~~~~~~~~~~~~~~~~")
         if event:
             event_data = event.event_data
