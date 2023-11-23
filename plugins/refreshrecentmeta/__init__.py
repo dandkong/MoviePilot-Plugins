@@ -96,7 +96,13 @@ class RefreshRecentMeta(_PluginBase):
         end_date = end_time.strftime("%Y-%m-%d")
         return end_date
 
-    def __refresh_recent(self):
+    @eventmanager.register(EventType.PluginAction)
+    def __refresh_recent(self, event: Event = None):
+        if event:
+            event_data = event.event_data
+            if not event_data or event_data.get("action") != "refreshrecentmeta":
+                return
+        
         if "emby" not in settings.MEDIASERVER:
             return
 
@@ -162,7 +168,19 @@ class RefreshRecentMeta(_PluginBase):
 
     @staticmethod
     def get_command() -> List[Dict[str, Any]]:
-        pass
+        """
+        定义远程控制命令
+        :return: 命令关键字、事件、描述、附带数据
+        """
+        return [{
+            "cmd": "/refreshrecentmeta",
+            "event": EventType.PluginAction,
+            "desc": "刷新最近元数据",
+            "category": "",
+            "data": {
+                "action": "refreshrecentmeta"
+            }
+        }]
 
     def get_api(self) -> List[Dict[str, Any]]:
         pass
