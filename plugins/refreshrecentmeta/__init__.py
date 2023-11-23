@@ -9,7 +9,7 @@ from app.core.config import settings
 from app.plugins import _PluginBase
 from typing import Any, List, Dict, Tuple, Optional
 from app.log import logger
-from app.schemas import NotificationType
+from app.schemas import EventType, NotificationType
 from app.utils.http import RequestUtils
 
 
