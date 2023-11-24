@@ -153,8 +153,8 @@ class RenameRecentFile(_PluginBase):
                 text="执行成功")
    
 
-    def __rename(self, path: str):
-        logger.info(f"尝试更新文件名：{path}")
+    def __rename(self, media_path: str):
+        logger.info(f"尝试更新文件名：{media_path}")
 
         # 处理路径映射 (处理同一媒体多分辨率的情况)
         if self._library_path:
@@ -163,9 +163,9 @@ class RenameRecentFile(_PluginBase):
                 sub_paths = path.split(":")
                 if len(sub_paths) < 2:
                     continue
-                path = path.replace(sub_paths[0], sub_paths[1]).replace('\\', '/')
+                media_path = media_path.replace(sub_paths[0], sub_paths[1]).replace('\\', '/')
 
-        file_path = Path(path)
+        file_path = Path(media_path)
 
         file_meta = MetaInfoPath(file_path)
         # 识别媒体信息
