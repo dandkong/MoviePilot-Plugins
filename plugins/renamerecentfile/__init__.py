@@ -22,9 +22,9 @@ from app.core.context import MediaInfo
 
 class RenameRecentFile(_PluginBase):
     # 插件名称
-    plugin_name = "自动重命名媒体文件"
+    plugin_name = "自动重命名剧集文件"
     # 插件描述
-    plugin_desc = "自动重命名最近发布媒体文件名"
+    plugin_desc = "自动重命名最近发布剧集文件名"
     # 插件图标
     plugin_icon = "backup.png"
     # 主题色
@@ -49,6 +49,7 @@ class RenameRecentFile(_PluginBase):
     _offset_days = "0"
     _onlyonce = False
     _notify = False
+    _library_path = None
 
     # 定时器
     _scheduler: Optional[BackgroundScheduler] = None
@@ -63,6 +64,7 @@ class RenameRecentFile(_PluginBase):
             self._offset_days = config.get("offset_days")
             self._notify = config.get("notify")
             self._onlyonce = config.get("onlyonce")
+            self._library_path = config.get("library_path")
 
             # 加载模块
         if self._enabled:
@@ -73,15 +75,15 @@ class RenameRecentFile(_PluginBase):
                 try:
                     self._scheduler.add_job(func=self.refresh_recent,
                                             trigger=CronTrigger.from_crontab(self._cron),
-                                            name="自动重命名媒体文件")
+                                            name="自动重命名剧集文件")
                 except Exception as err:
                     logger.error(f"定时任务配置错误：{str(err)}")
 
             if self._onlyonce:
-                logger.info(f"自动重命名媒体文件服务启动，立即运行一次")
+                logger.info(f"自动重命名剧集文件服务启动，立即运行一次")
                 self._scheduler.add_job(func=self.refresh_recent, trigger='date',
                                         run_date=datetime.now(tz=pytz.timezone(settings.TZ)) + timedelta(seconds=3),
-                                        name="自动重命名媒体文件")
+                                        name="自动重命名剧集文件")
                 # 关闭一次性开关
                 self._onlyonce = False
                 self.update_config({
@@ -90,6 +92,7 @@ class RenameRecentFile(_PluginBase):
                     "enabled": self._enabled,
                     "offset_days": self._offset_days,
                     "notify": self._notify,
+                    "library_path": self._library_path,
                 })
 
             # 启动任务
@@ -114,7 +117,7 @@ class RenameRecentFile(_PluginBase):
             return
 
         logger.info(
-            f"当前时间 {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))} 自动重命名媒体文件")
+            f"当前时间 {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))} 自动重命名剧集文件")
 
         host = settings.EMBY_HOST
         if host:
@@ -146,13 +149,24 @@ class RenameRecentFile(_PluginBase):
         if self._notify:
             self.post_message(
                 mtype=NotificationType.SiteMessage,
-                title=f"【自动重命名最近{self._offset_days}天媒体文件】",
+                title=f"【自动重命名最近{self._offset_days}天剧集文件】",
                 text="执行成功")
    
 
     def __rename(self, path: str):
         logger.info(f"尝试更新文件名：{path}")
-        file_path = Path(path.replace("data","downloads"))
+
+        # 处理路径映射 (处理同一媒体多分辨率的情况)
+        if self._library_path:
+            paths = self._library_path.split("\n")
+            for path in paths:
+                sub_paths = path.split(":")
+                if len(sub_paths) < 2:
+                    continue
+                path = path.replace(sub_paths[0], sub_paths[1]).replace('\\', '/')
+
+        file_path = Path(path)
+
         file_meta = MetaInfoPath(file_path)
         # 识别媒体信息
         mediainfo: MediaInfo = self.chain.recognize_media(meta=file_meta)
@@ -289,6 +303,28 @@ class RenameRecentFile(_PluginBase):
                                         'props': {
                                             'model': 'offset_days',
                                             'label': '几天内'
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        'component': 'VRow',
+                        'content': [
+                            {
+                                'component': 'VCol',
+                                'props': {
+                                    'cols': 12,
+                                },
+                                'content': [
+                                    {
+                                        'component': 'VTextarea',
+                                        'props': {
+                                            'model': 'library_path',
+                                            'rows': '2',
+                                            'label': '媒体库路径映射',
+                                            'placeholder': '媒体服务器路径:MoviePilot路径（一行一个）'
                                         }
                                     }
                                 ]

@@ -9,8 +9,8 @@
         "level": 1
     },
     "RenameRecentFile": {
-        "name": "自动重命名媒体文件",
-        "description": "自动重命名最近发布媒体文件名",
+        "name": "自动重命名剧集文件",
+        "description": "自动重命名最近发布剧集文件名",
         "version": "1.0",
         "icon": "backup.png",
         "color": "#4FB647",
