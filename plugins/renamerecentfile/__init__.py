@@ -167,6 +167,8 @@ class RenameRecentFile(_PluginBase):
 
         file_path = Path(media_path)
 
+        logger.info(f"尝试更新moviepilot文件名：{media_path}")
+
         file_meta = MetaInfoPath(file_path)
         # 识别媒体信息
         mediainfo: MediaInfo = self.chain.recognize_media(meta=file_meta)
