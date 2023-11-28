@@ -10,6 +10,7 @@ from app.log import logger
 from app.schemas.types import EventType
 from app.schemas import NotificationType
 import subprocess
+import shlex
 
 
 class RunCmd(_PluginBase):
@@ -96,9 +97,11 @@ class RunCmd(_PluginBase):
             if not event_data or event_data.get("action") != "runcmd":
                 return
         try:
-            subprocess.run(self._cmd)
-        except Exception as e:
-            logger.error(f"执行cmd出错" + str(e))
+            cmd_list = shlex.split(self._cmd)
+            result = subprocess.run(cmd_list, capture_output=True, text=True, check=True)
+            logger.info("执行cmd输出:", result.stdout)
+        except subprocess.CalledProcessError as e:
+            logger.error(f"执行cmd出错: {e}")
 
         # 发送通知
         if self._notify:
