@@ -15,9 +15,9 @@ import shlex
 
 class RunCmd(_PluginBase):
     # 插件名称
-    plugin_name = "执行cmd"
+    plugin_name = "执行命令行"
     # 插件描述
-    plugin_desc = "执行cmd"
+    plugin_desc = "执行命令行"
     # 插件图标
     plugin_icon = "backup.png"
     # 主题色
@@ -66,15 +66,15 @@ class RunCmd(_PluginBase):
                 try:
                     self._scheduler.add_job(func=self.run,
                                             trigger=CronTrigger.from_crontab(self._cron),
-                                            name="执行cmd")
+                                            name="执行命令行")
                 except Exception as err:
                     logger.error(f"定时任务配置错误：{str(err)}")
 
             if self._onlyonce:
-                logger.info(f"执行cmd服务启动，立即运行一次")
+                logger.info(f"执行命令行服务启动，立即运行一次")
                 self._scheduler.add_job(func=self.run, trigger='date',
                                         run_date=datetime.now(tz=pytz.timezone(settings.TZ)) + timedelta(seconds=3),
-                                        name="执行cmd")
+                                        name="执行命令行")
                 # 关闭一次性开关
                 self._onlyonce = False
                 self.update_config({
@@ -99,15 +99,12 @@ class RunCmd(_PluginBase):
             if not event_data or event_data.get("action") != "runcmd":
                 return
         try:
-            cmds = self._cmd.split("\n")
-            for cmd in cmds:
-                cmd_list = shlex.split(cmd)
-                result = result + subprocess.run(cmd_list, capture_output=True, text=True, check=True)
-                logger.info("执行cmd输出:" + result.stdout)
-                msg = result.stdout
+            cmd_list = shlex.split(self._cmd)
+            result = subprocess.run(cmd_list, capture_output=True, text=True, check=True)
+            msg = result.stdout
         except subprocess.CalledProcessError as e:
             success = False
-            logger.error(f"执行cmd出错: {e}")
+            logger.error(f"执行命令行出错: {e}")
             msg = f"{e}"
 
         # 发送通知
@@ -115,12 +112,12 @@ class RunCmd(_PluginBase):
             if success:
                 self.post_message(
                     mtype=NotificationType.SiteMessage,
-                    title=f"【执行cmd成功】",
+                    title=f"【执行命令行成功】",
                     text=msg)
             else:
                 self.post_message(
                     mtype=NotificationType.SiteMessage,
-                    title=f"【执行cmd失败】",
+                    title=f"【执行命令行失败】",
                     text=msg)
 
     def get_state(self) -> bool:
@@ -135,7 +132,7 @@ class RunCmd(_PluginBase):
         return [{
             "cmd": "/runcmd",
             "event": EventType.PluginAction,
-            "desc": "执行cmd",
+            "desc": "执行命令行",
             "category": "",
             "data": {
                 "action": "runcmd"
@@ -241,8 +238,8 @@ class RunCmd(_PluginBase):
                                         'props': {
                                             'model': 'cmd',
                                             'rows': '2',
-                                            'label': 'cmd命令',
-                                            'placeholder': 'cmd命令，每行一条'
+                                            'label': '命令行',
+                                            'placeholder': '命令行'
                                         }
                                     }
                                 ]
