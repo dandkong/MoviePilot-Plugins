@@ -16,5 +16,14 @@
         "color": "#4FB647",
         "author": "dandkong",
         "level": 1
+    },
+    "RunCmd": {
+        "name": "执行命令行",
+        "description": "执行命令行",
+        "version": "1.0",
+        "icon": "backup.png",
+        "color": "#4FB647",
+        "author": "dandkong",
+        "level": 1
     }
 }
