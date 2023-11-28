@@ -92,7 +92,7 @@ class RunCmd(_PluginBase):
 
     @eventmanager.register(EventType.PluginAction)
     def run(self, event: Event = None):
-        result = ""
+        msg = ""
         success = True
         if event:
             event_data = event.event_data
@@ -102,10 +102,11 @@ class RunCmd(_PluginBase):
             cmd_list = shlex.split(self._cmd)
             result = subprocess.run(cmd_list, capture_output=True, text=True, check=True)
             logger.info("执行cmd输出:" + result.stdout)
+            msg = result.stdout
         except subprocess.CalledProcessError as e:
             success = False
             logger.error(f"执行cmd出错: {e}")
-            result = f"{e}"
+            msg = f"{e}"
 
         # 发送通知
         if self._notify:
@@ -113,12 +114,12 @@ class RunCmd(_PluginBase):
                 self.post_message(
                     mtype=NotificationType.SiteMessage,
                     title=f"【执行cmd成功】",
-                    text=result)
+                    text=msg)
             else:
                 self.post_message(
                     mtype=NotificationType.SiteMessage,
                     title=f"【执行cmd失败】",
-                    text=result)
+                    text=msg)
 
     def get_state(self) -> bool:
         return self._enabled
