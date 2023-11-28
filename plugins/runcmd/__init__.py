@@ -99,7 +99,7 @@ class RunCmd(_PluginBase):
         try:
             cmd_list = shlex.split(self._cmd)
             result = subprocess.run(cmd_list, capture_output=True, text=True, check=True)
-            logger.info("执行cmd输出:", result.stdout)
+            logger.info("执行cmd输出:" + result.stdout)
         except subprocess.CalledProcessError as e:
             logger.error(f"执行cmd出错: {e}")
 
