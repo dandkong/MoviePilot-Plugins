@@ -92,6 +92,8 @@ class RunCmd(_PluginBase):
 
     @eventmanager.register(EventType.PluginAction)
     def run(self, event: Event = None):
+        result = ""
+        success = True
         if event:
             event_data = event.event_data
             if not event_data or event_data.get("action") != "runcmd":
@@ -101,14 +103,22 @@ class RunCmd(_PluginBase):
             result = subprocess.run(cmd_list, capture_output=True, text=True, check=True)
             logger.info("执行cmd输出:" + result.stdout)
         except subprocess.CalledProcessError as e:
+            success = False
             logger.error(f"执行cmd出错: {e}")
+            result = f"{e}"
 
         # 发送通知
         if self._notify:
-            self.post_message(
-                mtype=NotificationType.SiteMessage,
-                title=f"【执行cmd】",
-                text="执行成功")
+            if success:
+                self.post_message(
+                    mtype=NotificationType.SiteMessage,
+                    title=f"【执行cmd成功】",
+                    text=result)
+            else:
+                self.post_message(
+                    mtype=NotificationType.SiteMessage,
+                    title=f"【执行cmd失败】",
+                    text=result)
 
     def get_state(self) -> bool:
         return self._enabled
