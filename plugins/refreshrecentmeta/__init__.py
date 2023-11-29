@@ -127,9 +127,9 @@ class RefreshRecentMeta(_PluginBase):
         try:
             res = RequestUtils().get_res(req_url)
             if res:
+                success = True
                 res_items = res.json().get("Items")
                 if res_items:
-                    success = True
                     for res_item in res_items:
                         item_id = res_item.get('Id')
                         series_name = res_item.get('SeriesName')
