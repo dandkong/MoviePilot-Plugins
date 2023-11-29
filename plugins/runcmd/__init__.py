@@ -100,7 +100,7 @@ class RunCmd(_PluginBase):
                 return
         try:
             for cmd in self._cmd.split("\n"):
-                logger.info(cmd)
+                logger.info(f"执行命令行: {cmd}")
                 cmd_list = shlex.split(cmd)
                 result = subprocess.run(cmd_list, capture_output=True, text=True, check=True)
                 msg = msg + result.stdout
