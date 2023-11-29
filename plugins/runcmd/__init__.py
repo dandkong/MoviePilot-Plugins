@@ -20,8 +20,6 @@ class RunCmd(_PluginBase):
     plugin_desc = "执行命令行"
     # 插件图标
     plugin_icon = "backup.png"
-    # 主题色
-    plugin_color = "#4FB647"
     # 插件版本
     plugin_version = "1.0"
     # 插件作者
