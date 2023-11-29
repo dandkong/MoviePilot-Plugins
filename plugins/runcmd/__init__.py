@@ -37,7 +37,6 @@ class RunCmd(_PluginBase):
     _enabled = False
     # 任务执行间隔
     _cron = None
-    _offset_days = "0"
     _onlyonce = False
     _notify = False
     _cmd = None
