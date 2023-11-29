@@ -21,8 +21,8 @@
         "name": "执行命令行",
         "description": "执行命令行",
         "version": "1.0",
-        "icon": "backup.png",
-        "color": "#4FB647",
+        "icon": "https://cdns.iconmonstr.com/wp-content/releases/preview/7.3.0/240/iconmonstr-terminal-filled.png",
+        "color": "#333333",
         "author": "dandkong",
         "level": 1
     }

@@ -19,9 +19,9 @@ class RefreshRecentMeta(_PluginBase):
     # 插件描述
     plugin_desc = "自动刷新最近发布剧集元数据"
     # 插件图标
-    plugin_icon = "backup.png"
+    plugin_icon = "https://cdns.iconmonstr.com/wp-content/releases/preview/7.3.0/240/iconmonstr-terminal-filled.png"
     # 主题色
-    plugin_color = "#4FB647"
+    plugin_color = "#333333"
     # 插件版本
     plugin_version = "1.0"
     # 插件作者
