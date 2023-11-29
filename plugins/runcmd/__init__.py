@@ -99,9 +99,11 @@ class RunCmd(_PluginBase):
             if not event_data or event_data.get("action") != "runcmd":
                 return
         try:
-            cmd_list = shlex.split(self._cmd)
-            result = subprocess.run(cmd_list, capture_output=True, text=True, check=True)
-            msg = result.stdout
+            for cmd in self._cmd.split("\n"):
+                logger.info(cmd)
+                cmd_list = shlex.split(cmd)
+                result = subprocess.run(cmd_list, capture_output=True, text=True, check=True)
+                msg = msg + result.stdout
         except subprocess.CalledProcessError as e:
             success = False
             logger.error(f"执行命令行出错: {e}")
@@ -239,7 +241,7 @@ class RunCmd(_PluginBase):
                                             'model': 'cmd',
                                             'rows': '2',
                                             'label': '命令行',
-                                            'placeholder': '命令行'
+                                            'placeholder': '命令行，一行一条'
                                         }
                                     }
                                 ]
