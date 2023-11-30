@@ -12,6 +12,9 @@ from app.log import logger
 from app.schemas.types import EventType, NotificationType
 from app.utils.http import RequestUtils
 
+from app.modules.emby import Emby
+from app.modules.jellyfin import Jellyfin
+from app.modules.plex import Plex
 
 class RefreshRecentMeta(_PluginBase):
     # 插件名称
@@ -100,53 +103,18 @@ class RefreshRecentMeta(_PluginBase):
             event_data = event.event_data
             if not event_data or event_data.get("action") != "refreshrecentmeta":
                 return
-        
-        if "emby" not in settings.MEDIASERVER:
-            return
 
-        logger.info(
-            f"当前时间 {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))} 自动刷新剧集元数据")
-
-        host = settings.EMBY_HOST
-        if host:
-            if not host.endswith("/"):
-                host += "/"
-            if not host.startswith("http"):
-                host = "http://" + host
-
-        apikey = settings.EMBY_API_KEY
-
+        logger.info(f"当前时间 {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))} 自动刷新剧集元数据")
         success = False
-
-        if not host or not apikey:
-            return None
-        end_date = self.__get_date(-int(self._offset_days))
-        # 获得_offset_day加入的剧集
-        req_url = "%semby/Items?IncludeItemTypes=Episode&MinPremiereDate=%s&IsMissing=false&Recursive=true&api_key=%s" % (
-            host, end_date, apikey)
-        try:
-            res = RequestUtils().get_res(req_url)
-            if res:
-                success = True
-                res_items = res.json().get("Items")
-                if res_items:
-                    for res_item in res_items:
-                        item_id = res_item.get('Id')
-                        series_name = res_item.get('SeriesName')
-                        name = res_item.get('Name')
-                        # 刷新元数据
-                        req_url = "%semby/Items/%s/Refresh?MetadataRefreshMode=FullRefresh&ImageRefreshMode=FullRefresh&ReplaceAllMetadata=true&ReplaceAllImages=true&api_key=%s" % (
-                            host, item_id, apikey)
-                        try:
-                            res = RequestUtils().post_res(req_url)
-                            if res:
-                                logger.info(f"刷新元数据：{series_name} - {name}")
-                            else:
-                                logger.error(f"刷新媒体库对象 {item_id} 失败，无法连接Emby！")
-                        except Exception as e:
-                            logger.error(f"连接Items/Id/Refresh出错：" + str(e))
-        except Exception as e:
-            logger.error(f"连接Items出错：" + str(e))
+        # Emby
+        if "emby" in settings.MEDIASERVER:
+            success = success or self._refresh_emby()
+        # Jeyllyfin
+        if "jellyfin" in settings.MEDIASERVER:
+            logger.error("暂不支持jellyfin")
+        # Plex
+        if "plex" in settings.MEDIASERVER:
+            logger.error("暂不支持plex")
 
         # 发送通知
         if self._notify:
@@ -160,6 +128,30 @@ class RefreshRecentMeta(_PluginBase):
                     mtype=NotificationType.SiteMessage,
                     title=f"【自动刷新最近{self._offset_days}天剧集元数据】",
                     text="刷新失败，请查看日志")
+
+
+    def _refresh_emby(self) -> bool:
+        end_date = self.__get_date(-int(self._offset_days))
+        url = f"[HOST]emby/Items?IncludeItemTypes=Episode&MinPremiereDate={end_date}&IsMissing=false&Recursive=true&api_key=[APIKEY]"
+        res_g = Emby().get_data(url)
+        success = False
+        if res_g:
+            success = True 
+            res_items = res_g.json().get("Items")
+            if res_items:
+                for res_item in res_items:
+                    item_id = res_item.get('Id')
+                    series_name = res_item.get('SeriesName')
+                    name = res_item.get('Name')
+                    # 刷新元数据
+                    req_url = f"[HOST]emby/Items/{item_id}/Refresh?MetadataRefreshMode=FullRefresh&ImageRefreshMode=FullRefresh&ReplaceAllMetadata=true&ReplaceAllImages=true&api_key=[APIKEY]"
+                    res_pos = Emby().post_data(req_url)
+                    if res_pos:
+                        logger.info(f"刷新元数据：{series_name} - {name}")
+                    else:
+                        logger.error(f"刷新媒体库对象 {item_id} 失败，无法连接Emby！")
+        return success
+
 
     def get_state(self) -> bool:
         return self._enabled
