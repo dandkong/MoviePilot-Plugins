@@ -10,7 +10,6 @@ from app.plugins import _PluginBase
 from typing import Any, List, Dict, Tuple, Optional
 from app.log import logger
 from app.schemas.types import EventType, NotificationType
-from app.utils.http import RequestUtils
 
 from app.modules.emby import Emby
 from app.modules.jellyfin import Jellyfin
@@ -108,7 +107,7 @@ class RefreshRecentMeta(_PluginBase):
         success = False
         # Emby
         if "emby" in settings.MEDIASERVER:
-            success = success or self._refresh_emby()
+            success = success or self.__refresh_emby()
         # Jeyllyfin
         if "jellyfin" in settings.MEDIASERVER:
             logger.error("暂不支持jellyfin")
@@ -130,7 +129,7 @@ class RefreshRecentMeta(_PluginBase):
                     text="刷新失败，请查看日志")
 
 
-    def _refresh_emby(self) -> bool:
+    def __refresh_emby(self) -> bool:
         end_date = self.__get_date(-int(self._offset_days))
         url = f"[HOST]emby/Items?IncludeItemTypes=Episode&MinPremiereDate={end_date}&IsMissing=false&Recursive=true&api_key=[APIKEY]"
         res_g = Emby().get_data(url)

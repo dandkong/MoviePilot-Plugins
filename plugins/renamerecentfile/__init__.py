@@ -15,10 +15,12 @@ from typing import Any, List, Dict, Tuple, Optional
 from app.log import logger
 from app.schemas.types import EventType
 from app.schemas import NotificationType, TransferInfo
-from app.utils.http import RequestUtils
 from app.schemas.types import MediaType
 from app.core.context import MediaInfo
 
+from app.modules.emby import Emby
+from app.modules.jellyfin import Jellyfin
+from app.modules.plex import Plex
 
 class RenameRecentFile(_PluginBase):
     # 插件名称
@@ -111,37 +113,16 @@ class RenameRecentFile(_PluginBase):
             if not event_data or event_data.get("action") != "renamerecentfile":
                 return
 
-        if "emby" not in settings.MEDIASERVER:
-            return
-
-        logger.info(
-            f"当前时间 {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))} 自动重命名剧集文件")
-
-        host = settings.EMBY_HOST
-        if host:
-            if not host.endswith("/"):
-                host += "/"
-            if not host.startswith("http"):
-                host = "http://" + host
-
-        apikey = settings.EMBY_API_KEY
-
-        if not host or not apikey:
-            return None
-        end_date = self.__get_date(-int(self._offset_days))
-        # 获得_offset_day加入的剧集
-        req_url = "%semby/Items?IncludeItemTypes=Episode&MinPremiereDate=%s&Fields=Path&IsMissing=false&Recursive=true&api_key=%s" % (
-            host, end_date, apikey)
-        try:
-            res = RequestUtils().get_res(req_url)
-            if res:
-                res_items = res.json().get("Items")
-                if res_items:
-                    for res_item in res_items:
-                        path = res_item.get('Path')
-                        self.__rename(path)
-        except Exception as e:
-            logger.error(f"连接Items出错：" + str(e))
+        logger.info(f"当前时间 {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))} 自动重命名剧集文件")
+        # Emby
+        if "emby" in settings.MEDIASERVER:
+            self.__rename_by_emby()
+        # Jeyllyfin
+        if "jellyfin" in settings.MEDIASERVER:
+            logger.error("暂不支持jellyfin")
+        # Plex
+        if "plex" in settings.MEDIASERVER:
+            logger.error("暂不支持plex")
 
         # 发送通知
         if self._notify:
@@ -150,6 +131,17 @@ class RenameRecentFile(_PluginBase):
                 title=f"【自动重命名最近{self._offset_days}天剧集文件】",
                 text="执行成功")
    
+    def __rename_by_emby(self):
+        end_date = self.__get_date(-int(self._offset_days))
+        # 获得_offset_day加入的剧集
+        req_url = f"[HOST]emby/Items?IncludeItemTypes=Episode&MinPremiereDate={end_date}&Fields=Path&IsMissing=false&Recursive=true&api_key=[APIKEY]"
+        res = Emby().get_data(req_url)
+        if res:
+            res_items = res.json().get("Items")
+            if res_items:
+                for res_item in res_items:
+                    path = res_item.get('Path')
+                    self.__rename(path)
 
     def __rename(self, media_path: str):
         logger.info(f"尝试更新文件名：{media_path}")
