@@ -22,6 +22,7 @@ from app.modules.emby import Emby
 from app.modules.jellyfin import Jellyfin
 from app.modules.plex import Plex
 
+
 class RenameRecentFile(_PluginBase):
     # 插件名称
     plugin_name = "自动重命名剧集文件"
@@ -73,27 +74,35 @@ class RenameRecentFile(_PluginBase):
 
             if self._cron:
                 try:
-                    self._scheduler.add_job(func=self.refresh_recent,
-                                            trigger=CronTrigger.from_crontab(self._cron),
-                                            name="自动重命名剧集文件")
+                    self._scheduler.add_job(
+                        func=self.refresh_recent,
+                        trigger=CronTrigger.from_crontab(self._cron),
+                        name="自动重命名剧集文件",
+                    )
                 except Exception as err:
                     logger.error(f"定时任务配置错误：{str(err)}")
 
             if self._onlyonce:
                 logger.info(f"自动重命名剧集文件服务启动，立即运行一次")
-                self._scheduler.add_job(func=self.refresh_recent, trigger='date',
-                                        run_date=datetime.now(tz=pytz.timezone(settings.TZ)) + timedelta(seconds=3),
-                                        name="自动重命名剧集文件")
+                self._scheduler.add_job(
+                    func=self.refresh_recent,
+                    trigger="date",
+                    run_date=datetime.now(tz=pytz.timezone(settings.TZ))
+                    + timedelta(seconds=3),
+                    name="自动重命名剧集文件",
+                )
                 # 关闭一次性开关
                 self._onlyonce = False
-                self.update_config({
-                    "onlyonce": False,
-                    "cron": self._cron,
-                    "enabled": self._enabled,
-                    "offset_days": self._offset_days,
-                    "notify": self._notify,
-                    "library_path": self._library_path,
-                })
+                self.update_config(
+                    {
+                        "onlyonce": False,
+                        "cron": self._cron,
+                        "enabled": self._enabled,
+                        "offset_days": self._offset_days,
+                        "notify": self._notify,
+                        "library_path": self._library_path,
+                    }
+                )
 
             # 启动任务
             if self._scheduler.get_jobs():
@@ -113,7 +122,9 @@ class RenameRecentFile(_PluginBase):
             if not event_data or event_data.get("action") != "renamerecentfile":
                 return
 
-        logger.info(f"当前时间 {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))} 自动重命名剧集文件")
+        logger.info(
+            f"当前时间 {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))} 自动重命名剧集文件"
+        )
         # Emby
         if "emby" in settings.MEDIASERVER:
             self.__rename_by_emby()
@@ -129,8 +140,9 @@ class RenameRecentFile(_PluginBase):
             self.post_message(
                 mtype=NotificationType.SiteMessage,
                 title=f"【自动重命名最近{self._offset_days}天剧集文件】",
-                text="执行成功")
-   
+                text="执行成功",
+            )
+
     def __rename_by_emby(self):
         end_date = self.__get_date(-int(self._offset_days))
         # 获得_offset_day加入的剧集
@@ -140,7 +152,7 @@ class RenameRecentFile(_PluginBase):
             res_items = res.json().get("Items")
             if res_items:
                 for res_item in res_items:
-                    path = res_item.get('Path')
+                    path = res_item.get("Path")
                     self.__rename(path)
 
     def __rename(self, media_path: str):
@@ -153,7 +165,9 @@ class RenameRecentFile(_PluginBase):
                 sub_paths = path.split(":")
                 if len(sub_paths) < 2:
                     continue
-                media_path = media_path.replace(sub_paths[0], sub_paths[1]).replace('\\', '/')
+                media_path = media_path.replace(sub_paths[0], sub_paths[1]).replace(
+                    "\\", "/"
+                )
 
         file_path = Path(media_path)
 
@@ -165,17 +179,20 @@ class RenameRecentFile(_PluginBase):
 
         # 获取集数据
         if mediainfo.type == MediaType.TV:
-            episodes_info = self.tmdbchain.tmdb_episodes(tmdbid=mediainfo.tmdb_id,
-                                                            season=file_meta.begin_season or 1)
+            episodes_info = self.tmdbchain.tmdb_episodes(
+                tmdbid=mediainfo.tmdb_id, season=file_meta.begin_season or 1
+            )
         else:
             episodes_info = None
 
         # 转移
-        transferinfo: TransferInfo = self.chain.transfer(mediainfo=mediainfo,
-                                                            path=file_path,
-                                                            transfer_type="move",
-                                                            meta=file_meta,
-                                                            episodes_info=episodes_info)
+        transferinfo: TransferInfo = self.chain.transfer(
+            mediainfo=mediainfo,
+            path=file_path,
+            transfer_type="move",
+            meta=file_meta,
+            episodes_info=episodes_info,
+        )
         if not transferinfo:
             logger.error("文件转移模块运行失败")
             return False
@@ -190,15 +207,15 @@ class RenameRecentFile(_PluginBase):
         定义远程控制命令
         :return: 命令关键字、事件、描述、附带数据
         """
-        return [{
-            "cmd": "/renamerecentfile",
-            "event": EventType.PluginAction,
-            "desc": "重命名最近文件",
-            "category": "",
-            "data": {
-                "action": "renamerecentfile"
+        return [
+            {
+                "cmd": "/renamerecentfile",
+                "event": EventType.PluginAction,
+                "desc": "重命名最近文件",
+                "category": "",
+                "data": {"action": "renamerecentfile"},
             }
-        }]
+        ]
 
     def get_api(self) -> List[Dict[str, Any]]:
         pass
@@ -209,127 +226,105 @@ class RenameRecentFile(_PluginBase):
         """
         return [
             {
-                'component': 'VForm',
-                'content': [
+                "component": "VForm",
+                "content": [
                     {
-                        'component': 'VRow',
-                        'content': [
+                        "component": "VRow",
+                        "content": [
                             {
-                                'component': 'VCol',
-                                'props': {
-                                    'cols': 12,
-                                    'md': 4
-                                },
-                                'content': [
+                                "component": "VCol",
+                                "props": {"cols": 12, "md": 4},
+                                "content": [
                                     {
-                                        'component': 'VSwitch',
-                                        'props': {
-                                            'model': 'enabled',
-                                            'label': '启用插件',
-                                        }
+                                        "component": "VSwitch",
+                                        "props": {
+                                            "model": "enabled",
+                                            "label": "启用插件",
+                                        },
                                     }
-                                ]
+                                ],
                             },
                             {
-                                'component': 'VCol',
-                                'props': {
-                                    'cols': 12,
-                                    'md': 4
-                                },
-                                'content': [
+                                "component": "VCol",
+                                "props": {"cols": 12, "md": 4},
+                                "content": [
                                     {
-                                        'component': 'VSwitch',
-                                        'props': {
-                                            'model': 'notify',
-                                            'label': '开启通知',
-                                        }
+                                        "component": "VSwitch",
+                                        "props": {
+                                            "model": "notify",
+                                            "label": "开启通知",
+                                        },
                                     }
-                                ]
+                                ],
                             },
                             {
-                                'component': 'VCol',
-                                'props': {
-                                    'cols': 12,
-                                    'md': 4
-                                },
-                                'content': [
+                                "component": "VCol",
+                                "props": {"cols": 12, "md": 4},
+                                "content": [
                                     {
-                                        'component': 'VSwitch',
-                                        'props': {
-                                            'model': 'onlyonce',
-                                            'label': '立即运行一次',
-                                        }
+                                        "component": "VSwitch",
+                                        "props": {
+                                            "model": "onlyonce",
+                                            "label": "立即运行一次",
+                                        },
                                     }
-                                ]
-                            }
-                        ]
+                                ],
+                            },
+                        ],
                     },
                     {
-                        'component': 'VRow',
-                        'content': [
+                        "component": "VRow",
+                        "content": [
                             {
-                                'component': 'VCol',
-                                'props': {
-                                    'cols': 12,
-                                    'md': 6
-                                },
-                                'content': [
+                                "component": "VCol",
+                                "props": {"cols": 12, "md": 6},
+                                "content": [
                                     {
-                                        'component': 'VTextField',
-                                        'props': {
-                                            'model': 'cron',
-                                            'label': '执行周期'
-                                        }
+                                        "component": "VTextField",
+                                        "props": {"model": "cron", "label": "执行周期"},
                                     }
-                                ]
+                                ],
                             },
                             {
-                                'component': 'VCol',
-                                'props': {
-                                    'cols': 12,
-                                    'md': 6
-                                },
-                                'content': [
+                                "component": "VCol",
+                                "props": {"cols": 12, "md": 6},
+                                "content": [
                                     {
-                                        'component': 'VTextField',
-                                        'props': {
-                                            'model': 'offset_days',
-                                            'label': '几天内'
-                                        }
+                                        "component": "VTextField",
+                                        "props": {
+                                            "model": "offset_days",
+                                            "label": "几天内",
+                                        },
                                     }
-                                ]
-                            }
-                        ]
+                                ],
+                            },
+                        ],
                     },
                     {
-                        'component': 'VRow',
-                        'content': [
+                        "component": "VRow",
+                        "content": [
                             {
-                                'component': 'VCol',
-                                'props': {
-                                    'cols': 12,
+                                "component": "VCol",
+                                "props": {
+                                    "cols": 12,
                                 },
-                                'content': [
+                                "content": [
                                     {
-                                        'component': 'VTextarea',
-                                        'props': {
-                                            'model': 'library_path',
-                                            'rows': '2',
-                                            'label': '媒体库路径映射',
-                                            'placeholder': '媒体服务器路径:MoviePilot路径（一行一个）'
-                                        }
+                                        "component": "VTextarea",
+                                        "props": {
+                                            "model": "library_path",
+                                            "rows": "2",
+                                            "label": "媒体库路径映射",
+                                            "placeholder": "媒体服务器路径:MoviePilot路径（一行一个）",
+                                        },
                                     }
-                                ]
+                                ],
                             }
-                        ]
-                    }
-                ]
+                        ],
+                    },
+                ],
             }
-        ], {
-            "enabled": False,
-            "request_method": "POST",
-            "webhook_url": ""
-        }
+        ], {"enabled": False, "request_method": "POST", "webhook_url": ""}
 
     def get_page(self) -> List[dict]:
         pass

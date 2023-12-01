@@ -61,26 +61,34 @@ class RunCmd(_PluginBase):
 
             if self._cron:
                 try:
-                    self._scheduler.add_job(func=self.run,
-                                            trigger=CronTrigger.from_crontab(self._cron),
-                                            name="执行命令行")
+                    self._scheduler.add_job(
+                        func=self.run,
+                        trigger=CronTrigger.from_crontab(self._cron),
+                        name="执行命令行",
+                    )
                 except Exception as err:
                     logger.error(f"定时任务配置错误：{str(err)}")
 
             if self._onlyonce:
                 logger.info(f"执行命令行服务启动，立即运行一次")
-                self._scheduler.add_job(func=self.run, trigger='date',
-                                        run_date=datetime.now(tz=pytz.timezone(settings.TZ)) + timedelta(seconds=3),
-                                        name="执行命令行")
+                self._scheduler.add_job(
+                    func=self.run,
+                    trigger="date",
+                    run_date=datetime.now(tz=pytz.timezone(settings.TZ))
+                    + timedelta(seconds=3),
+                    name="执行命令行",
+                )
                 # 关闭一次性开关
                 self._onlyonce = False
-                self.update_config({
-                    "onlyonce": False,
-                    "cron": self._cron,
-                    "enabled": self._enabled,
-                    "notify": self._notify,
-                    "cmd": self._cmd,
-                })
+                self.update_config(
+                    {
+                        "onlyonce": False,
+                        "cron": self._cron,
+                        "enabled": self._enabled,
+                        "notify": self._notify,
+                        "cmd": self._cmd,
+                    }
+                )
 
             # 启动任务
             if self._scheduler.get_jobs():
@@ -99,7 +107,9 @@ class RunCmd(_PluginBase):
             for cmd in self._cmd.split("\n"):
                 logger.info(f"执行命令行: {cmd}")
                 cmd_list = shlex.split(cmd)
-                result = subprocess.run(cmd_list, capture_output=True, text=True, check=True)
+                result = subprocess.run(
+                    cmd_list, capture_output=True, text=True, check=True
+                )
                 msg = msg + result.stdout
         except subprocess.CalledProcessError as e:
             success = False
@@ -110,14 +120,12 @@ class RunCmd(_PluginBase):
         if self._notify:
             if success:
                 self.post_message(
-                    mtype=NotificationType.SiteMessage,
-                    title=f"【执行命令行成功】",
-                    text=msg)
+                    mtype=NotificationType.SiteMessage, title=f"【执行命令行成功】", text=msg
+                )
             else:
                 self.post_message(
-                    mtype=NotificationType.SiteMessage,
-                    title=f"【执行命令行失败】",
-                    text=msg)
+                    mtype=NotificationType.SiteMessage, title=f"【执行命令行失败】", text=msg
+                )
 
     def get_state(self) -> bool:
         return self._enabled
@@ -128,15 +136,15 @@ class RunCmd(_PluginBase):
         定义远程控制命令
         :return: 命令关键字、事件、描述、附带数据
         """
-        return [{
-            "cmd": "/runcmd",
-            "event": EventType.PluginAction,
-            "desc": "执行命令行",
-            "category": "",
-            "data": {
-                "action": "runcmd"
+        return [
+            {
+                "cmd": "/runcmd",
+                "event": EventType.PluginAction,
+                "desc": "执行命令行",
+                "category": "",
+                "data": {"action": "runcmd"},
             }
-        }]
+        ]
 
     def get_api(self) -> List[Dict[str, Any]]:
         pass
@@ -147,110 +155,94 @@ class RunCmd(_PluginBase):
         """
         return [
             {
-                'component': 'VForm',
-                'content': [
+                "component": "VForm",
+                "content": [
                     {
-                        'component': 'VRow',
-                        'content': [
+                        "component": "VRow",
+                        "content": [
                             {
-                                'component': 'VCol',
-                                'props': {
-                                    'cols': 12,
-                                    'md': 4
-                                },
-                                'content': [
+                                "component": "VCol",
+                                "props": {"cols": 12, "md": 4},
+                                "content": [
                                     {
-                                        'component': 'VSwitch',
-                                        'props': {
-                                            'model': 'enabled',
-                                            'label': '启用插件',
-                                        }
+                                        "component": "VSwitch",
+                                        "props": {
+                                            "model": "enabled",
+                                            "label": "启用插件",
+                                        },
                                     }
-                                ]
+                                ],
                             },
                             {
-                                'component': 'VCol',
-                                'props': {
-                                    'cols': 12,
-                                    'md': 4
-                                },
-                                'content': [
+                                "component": "VCol",
+                                "props": {"cols": 12, "md": 4},
+                                "content": [
                                     {
-                                        'component': 'VSwitch',
-                                        'props': {
-                                            'model': 'notify',
-                                            'label': '开启通知',
-                                        }
+                                        "component": "VSwitch",
+                                        "props": {
+                                            "model": "notify",
+                                            "label": "开启通知",
+                                        },
                                     }
-                                ]
+                                ],
                             },
                             {
-                                'component': 'VCol',
-                                'props': {
-                                    'cols': 12,
-                                    'md': 4
-                                },
-                                'content': [
+                                "component": "VCol",
+                                "props": {"cols": 12, "md": 4},
+                                "content": [
                                     {
-                                        'component': 'VSwitch',
-                                        'props': {
-                                            'model': 'onlyonce',
-                                            'label': '立即运行一次',
-                                        }
+                                        "component": "VSwitch",
+                                        "props": {
+                                            "model": "onlyonce",
+                                            "label": "立即运行一次",
+                                        },
                                     }
-                                ]
-                            }
-                        ]
+                                ],
+                            },
+                        ],
                     },
                     {
-                        'component': 'VRow',
-                        'content': [
+                        "component": "VRow",
+                        "content": [
                             {
-                                'component': 'VCol',
-                                'props': {
-                                    'cols': 12,
+                                "component": "VCol",
+                                "props": {
+                                    "cols": 12,
                                 },
-                                'content': [
+                                "content": [
                                     {
-                                        'component': 'VTextField',
-                                        'props': {
-                                            'model': 'cron',
-                                            'label': '执行周期'
-                                        }
+                                        "component": "VTextField",
+                                        "props": {"model": "cron", "label": "执行周期"},
                                     }
-                                ]
+                                ],
                             }
-                        ]
+                        ],
                     },
                     {
-                        'component': 'VRow',
-                        'content': [
+                        "component": "VRow",
+                        "content": [
                             {
-                                'component': 'VCol',
-                                'props': {
-                                    'cols': 12,
+                                "component": "VCol",
+                                "props": {
+                                    "cols": 12,
                                 },
-                                'content': [
+                                "content": [
                                     {
-                                        'component': 'VTextarea',
-                                        'props': {
-                                            'model': 'cmd',
-                                            'rows': '2',
-                                            'label': '命令行',
-                                            'placeholder': '命令行，一行一条'
-                                        }
+                                        "component": "VTextarea",
+                                        "props": {
+                                            "model": "cmd",
+                                            "rows": "2",
+                                            "label": "命令行",
+                                            "placeholder": "命令行，一行一条",
+                                        },
                                     }
-                                ]
+                                ],
                             }
-                        ]
-                    }
-                ]
+                        ],
+                    },
+                ],
             }
-        ], {
-            "enabled": False,
-            "request_method": "POST",
-            "webhook_url": ""
-        }
+        ], {"enabled": False, "request_method": "POST", "webhook_url": ""}
 
     def get_page(self) -> List[dict]:
         pass

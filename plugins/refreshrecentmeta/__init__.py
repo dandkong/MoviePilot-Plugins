@@ -15,6 +15,7 @@ from app.modules.emby import Emby
 from app.modules.jellyfin import Jellyfin
 from app.modules.plex import Plex
 
+
 class RefreshRecentMeta(_PluginBase):
     # 插件名称
     plugin_name = "自动刷新剧集元数据"
@@ -64,26 +65,34 @@ class RefreshRecentMeta(_PluginBase):
 
             if self._cron:
                 try:
-                    self._scheduler.add_job(func=self.refresh_recent,
-                                            trigger=CronTrigger.from_crontab(self._cron),
-                                            name="自动刷新剧集元数据")
+                    self._scheduler.add_job(
+                        func=self.refresh_recent,
+                        trigger=CronTrigger.from_crontab(self._cron),
+                        name="自动刷新剧集元数据",
+                    )
                 except Exception as err:
                     logger.error(f"定时任务配置错误：{str(err)}")
 
             if self._onlyonce:
                 logger.info(f"自动刷新最近剧集元数据服务启动，立即运行一次")
-                self._scheduler.add_job(func=self.refresh_recent, trigger='date',
-                                        run_date=datetime.now(tz=pytz.timezone(settings.TZ)) + timedelta(seconds=3),
-                                        name="自动刷新剧集元数据")
+                self._scheduler.add_job(
+                    func=self.refresh_recent,
+                    trigger="date",
+                    run_date=datetime.now(tz=pytz.timezone(settings.TZ))
+                    + timedelta(seconds=3),
+                    name="自动刷新剧集元数据",
+                )
                 # 关闭一次性开关
                 self._onlyonce = False
-                self.update_config({
-                    "onlyonce": False,
-                    "cron": self._cron,
-                    "enabled": self._enabled,
-                    "offset_days": self._offset_days,
-                    "notify": self._notify,
-                })
+                self.update_config(
+                    {
+                        "onlyonce": False,
+                        "cron": self._cron,
+                        "enabled": self._enabled,
+                        "offset_days": self._offset_days,
+                        "notify": self._notify,
+                    }
+                )
 
             # 启动任务
             if self._scheduler.get_jobs():
@@ -103,7 +112,9 @@ class RefreshRecentMeta(_PluginBase):
             if not event_data or event_data.get("action") != "refreshrecentmeta":
                 return
 
-        logger.info(f"当前时间 {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))} 自动刷新剧集元数据")
+        logger.info(
+            f"当前时间 {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))} 自动刷新剧集元数据"
+        )
         success = False
         # Emby
         if "emby" in settings.MEDIASERVER:
@@ -121,13 +132,14 @@ class RefreshRecentMeta(_PluginBase):
                 self.post_message(
                     mtype=NotificationType.SiteMessage,
                     title=f"【自动刷新最近{self._offset_days}天剧集元数据】",
-                    text="刷新成功")
+                    text="刷新成功",
+                )
             else:
                 self.post_message(
                     mtype=NotificationType.SiteMessage,
                     title=f"【自动刷新最近{self._offset_days}天剧集元数据】",
-                    text="刷新失败，请查看日志")
-
+                    text="刷新失败，请查看日志",
+                )
 
     def __refresh_emby(self) -> bool:
         end_date = self.__get_date(-int(self._offset_days))
@@ -135,13 +147,13 @@ class RefreshRecentMeta(_PluginBase):
         res_g = Emby().get_data(url)
         success = False
         if res_g:
-            success = True 
+            success = True
             res_items = res_g.json().get("Items")
             if res_items:
                 for res_item in res_items:
-                    item_id = res_item.get('Id')
-                    series_name = res_item.get('SeriesName')
-                    name = res_item.get('Name')
+                    item_id = res_item.get("Id")
+                    series_name = res_item.get("SeriesName")
+                    name = res_item.get("Name")
                     # 刷新元数据
                     req_url = f"[HOST]emby/Items/{item_id}/Refresh?MetadataRefreshMode=FullRefresh&ImageRefreshMode=FullRefresh&ReplaceAllMetadata=true&ReplaceAllImages=true&api_key=[APIKEY]"
                     res_pos = Emby().post_data(req_url)
@@ -150,7 +162,6 @@ class RefreshRecentMeta(_PluginBase):
                     else:
                         logger.error(f"刷新媒体库对象 {item_id} 失败，无法连接Emby！")
         return success
-
 
     def get_state(self) -> bool:
         return self._enabled
@@ -161,15 +172,15 @@ class RefreshRecentMeta(_PluginBase):
         定义远程控制命令
         :return: 命令关键字、事件、描述、附带数据
         """
-        return [{
-            "cmd": "/refreshrecentmeta",
-            "event": EventType.PluginAction,
-            "desc": "刷新最近元数据",
-            "category": "",
-            "data": {
-                "action": "refreshrecentmeta"
+        return [
+            {
+                "cmd": "/refreshrecentmeta",
+                "event": EventType.PluginAction,
+                "desc": "刷新最近元数据",
+                "category": "",
+                "data": {"action": "refreshrecentmeta"},
             }
-        }]
+        ]
 
     def get_api(self) -> List[Dict[str, Any]]:
         pass
@@ -180,105 +191,83 @@ class RefreshRecentMeta(_PluginBase):
         """
         return [
             {
-                'component': 'VForm',
-                'content': [
+                "component": "VForm",
+                "content": [
                     {
-                        'component': 'VRow',
-                        'content': [
+                        "component": "VRow",
+                        "content": [
                             {
-                                'component': 'VCol',
-                                'props': {
-                                    'cols': 12,
-                                    'md': 4
-                                },
-                                'content': [
+                                "component": "VCol",
+                                "props": {"cols": 12, "md": 4},
+                                "content": [
                                     {
-                                        'component': 'VSwitch',
-                                        'props': {
-                                            'model': 'enabled',
-                                            'label': '启用插件',
-                                        }
+                                        "component": "VSwitch",
+                                        "props": {
+                                            "model": "enabled",
+                                            "label": "启用插件",
+                                        },
                                     }
-                                ]
+                                ],
                             },
                             {
-                                'component': 'VCol',
-                                'props': {
-                                    'cols': 12,
-                                    'md': 4
-                                },
-                                'content': [
+                                "component": "VCol",
+                                "props": {"cols": 12, "md": 4},
+                                "content": [
                                     {
-                                        'component': 'VSwitch',
-                                        'props': {
-                                            'model': 'notify',
-                                            'label': '开启通知',
-                                        }
+                                        "component": "VSwitch",
+                                        "props": {
+                                            "model": "notify",
+                                            "label": "开启通知",
+                                        },
                                     }
-                                ]
+                                ],
                             },
                             {
-                                'component': 'VCol',
-                                'props': {
-                                    'cols': 12,
-                                    'md': 4
-                                },
-                                'content': [
+                                "component": "VCol",
+                                "props": {"cols": 12, "md": 4},
+                                "content": [
                                     {
-                                        'component': 'VSwitch',
-                                        'props': {
-                                            'model': 'onlyonce',
-                                            'label': '立即运行一次',
-                                        }
+                                        "component": "VSwitch",
+                                        "props": {
+                                            "model": "onlyonce",
+                                            "label": "立即运行一次",
+                                        },
                                     }
-                                ]
-                            }
-                        ]
+                                ],
+                            },
+                        ],
                     },
                     {
-                        'component': 'VRow',
-                        'content': [
+                        "component": "VRow",
+                        "content": [
                             {
-                                'component': 'VCol',
-                                'props': {
-                                    'cols': 12,
-                                    'md': 6
-                                },
-                                'content': [
+                                "component": "VCol",
+                                "props": {"cols": 12, "md": 6},
+                                "content": [
                                     {
-                                        'component': 'VTextField',
-                                        'props': {
-                                            'model': 'cron',
-                                            'label': '执行周期'
-                                        }
+                                        "component": "VTextField",
+                                        "props": {"model": "cron", "label": "执行周期"},
                                     }
-                                ]
+                                ],
                             },
                             {
-                                'component': 'VCol',
-                                'props': {
-                                    'cols': 12,
-                                    'md': 6
-                                },
-                                'content': [
+                                "component": "VCol",
+                                "props": {"cols": 12, "md": 6},
+                                "content": [
                                     {
-                                        'component': 'VTextField',
-                                        'props': {
-                                            'model': 'offset_days',
-                                            'label': '几天内'
-                                        }
+                                        "component": "VTextField",
+                                        "props": {
+                                            "model": "offset_days",
+                                            "label": "几天内",
+                                        },
                                     }
-                                ]
-                            }
-                        ]
-                    }
-                ]
+                                ],
+                            },
+                        ],
+                    },
+                ],
             }
-        ], {
-            "enabled": False,
-            "request_method": "POST",
-            "webhook_url": ""
-        }
+        ], {"enabled": False, "request_method": "POST", "webhook_url": ""}
 
     def get_page(self) -> List[dict]:
         pass
