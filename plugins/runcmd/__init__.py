@@ -17,7 +17,7 @@ class RunCmd(_PluginBase):
     # 插件名称
     plugin_name = "执行命令行"
     # 插件描述
-    plugin_desc = "执行命令行"
+    plugin_desc = "定时容器内执行命令行"
     # 插件图标
     plugin_icon = "backup.png"
     # 插件版本

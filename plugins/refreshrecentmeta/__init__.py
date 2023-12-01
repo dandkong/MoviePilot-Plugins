@@ -18,9 +18,9 @@ from app.modules.plex import Plex
 
 class RefreshRecentMeta(_PluginBase):
     # 插件名称
-    plugin_name = "自动刷新剧集元数据"
+    plugin_name = "刷新剧集元数据"
     # 插件描述
-    plugin_desc = "自动刷新最近发布剧集元数据"
+    plugin_desc = "定时通知媒体库刷新最近发布剧集元数据"
     # 插件图标
     plugin_icon = "backup.png"
     # 插件版本
@@ -68,7 +68,7 @@ class RefreshRecentMeta(_PluginBase):
                     self._scheduler.add_job(
                         func=self.refresh_recent,
                         trigger=CronTrigger.from_crontab(self._cron),
-                        name="自动刷新剧集元数据",
+                        name="刷新剧集元数据",
                     )
                 except Exception as err:
                     logger.error(f"定时任务配置错误：{str(err)}")
@@ -80,7 +80,7 @@ class RefreshRecentMeta(_PluginBase):
                     trigger="date",
                     run_date=datetime.now(tz=pytz.timezone(settings.TZ))
                     + timedelta(seconds=3),
-                    name="自动刷新剧集元数据",
+                    name="刷新剧集元数据",
                 )
                 # 关闭一次性开关
                 self._onlyonce = False
@@ -113,7 +113,7 @@ class RefreshRecentMeta(_PluginBase):
                 return
 
         logger.info(
-            f"当前时间 {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))} 自动刷新剧集元数据"
+            f"当前时间 {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))} 刷新剧集元数据"
         )
         success = False
         # Emby

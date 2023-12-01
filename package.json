@@ -1,15 +1,15 @@
 {
     "RefreshRecentMeta": {
-        "name": "自动刷新剧集元数据",
-        "description": "自动刷新最近发布剧集元数据",
+        "name": "刷新剧集元数据",
+        "description": "定时通知媒体库刷新最近发布剧集元数据",
         "version": "1.0",
         "icon": "backup.png",
         "author": "dandkong",
         "level": 1
     },
     "RenameRecentFile": {
-        "name": "自动重命名剧集文件",
-        "description": "自动重命名最近发布剧集文件名",
+        "name": "重命名剧集文件",
+        "description": "定时重命名最近发布剧集文件名",
         "version": "1.0",
         "icon": "backup.png",
         "author": "dandkong",
@@ -17,7 +17,7 @@
     },
     "RunCmd": {
         "name": "执行命令行",
-        "description": "执行命令行",
+        "description": "定时执行命令行",
         "version": "1.0",
         "icon": "backup.png",
         "author": "dandkong",
