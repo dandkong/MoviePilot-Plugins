@@ -17,7 +17,7 @@
     },
     "RunCmd": {
         "name": "执行命令行",
-        "description": "定时执行命令行",
+        "description": "定时容器内执行命令行",
         "version": "1.0",
         "icon": "backup.png",
         "author": "dandkong",
