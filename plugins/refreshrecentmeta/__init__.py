@@ -74,7 +74,7 @@ class RefreshRecentMeta(_PluginBase):
                     logger.error(f"定时任务配置错误：{str(err)}")
 
             if self._onlyonce:
-                logger.info(f"自动刷新最近剧集元数据服务启动，立即运行一次")
+                logger.info(f"刷新最近剧集元数据服务启动，立即运行一次")
                 self._scheduler.add_job(
                     func=self.refresh_recent,
                     trigger="date",
@@ -131,13 +131,13 @@ class RefreshRecentMeta(_PluginBase):
             if success:
                 self.post_message(
                     mtype=NotificationType.SiteMessage,
-                    title=f"【自动刷新最近{self._offset_days}天剧集元数据】",
+                    title=f"【刷新最近{self._offset_days}天剧集元数据】",
                     text="刷新成功",
                 )
             else:
                 self.post_message(
                     mtype=NotificationType.SiteMessage,
-                    title=f"【自动刷新最近{self._offset_days}天剧集元数据】",
+                    title=f"【刷新最近{self._offset_days}天剧集元数据】",
                     text="刷新失败，请查看日志",
                 )
 

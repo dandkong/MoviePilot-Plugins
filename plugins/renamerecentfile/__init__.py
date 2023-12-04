@@ -139,7 +139,7 @@ class RenameRecentFile(_PluginBase):
         if self._notify:
             self.post_message(
                 mtype=NotificationType.SiteMessage,
-                title=f"【自动重命名最近{self._offset_days}天剧集文件】",
+                title=f"【重命名最近{self._offset_days}天剧集文件】",
                 text="执行成功",
             )
 
