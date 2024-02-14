@@ -105,13 +105,6 @@ class RunCmd(_PluginBase):
                 return
         try:
             for cmd in self._cmd.split("\n"):
-                # 发送通知
-                if self._notify:
-                    self.post_message(
-                        mtype=NotificationType.SiteMessage, 
-                        title="【执行命令行】", 
-                        text=cmd, 
-                    )
                 logger.info(f"执行命令行: {cmd}")
                 cmd_list = shlex.split(cmd)
                 result = subprocess.run(
