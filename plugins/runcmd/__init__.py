@@ -104,10 +104,10 @@ class RunCmd(_PluginBase):
             if not event_data or event_data.get("action") != "runcmd":
                 return
         try:
+             # 发送通知
+            if self._notify:
+                self.post_message(mtype=NotificationType.SiteMessage, title="【执行命令行】", text="开始执行...")
             for cmd in self._cmd.split("\n"):
-                # 发送通知
-                if self._notify:
-                    self.post_message(mtype=NotificationType.SiteMessage, title="【执行命令行】", text=cmd)
                 logger.info(f"执行命令行: {cmd}")
                 cmd_list = shlex.split(cmd)
                 result = subprocess.run(
