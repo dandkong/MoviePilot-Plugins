@@ -109,8 +109,8 @@ class RunCmd(_PluginBase):
                 if self._notify:
                     self.post_message(
                         mtype=NotificationType.SiteMessage, 
-                        title="【执行命令行成功】", 
-                        text=msg, 
+                        title="【执行命令行】", 
+                        text=cmd, 
                     )
                 logger.info(f"执行命令行: {cmd}")
                 cmd_list = shlex.split(cmd)
