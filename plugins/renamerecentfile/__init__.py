@@ -154,6 +154,16 @@ class RenameRecentFile(_PluginBase):
                 for res_item in res_items:
                     path = res_item.get("Path")
                     self.__rename(path)
+        # 保底，有些剧集没有发布日期
+        req_url = f"[HOST]emby/Items?IncludeItemTypes=Episode&MaxPremiereDate=1900-01-01&Fields=Path&IsMissing=false&Recursive=true&api_key=[APIKEY]"
+        res = Emby().get_data(req_url)
+        if res:
+            res_items = res.json().get("Items")
+            if res_items:
+                for res_item in res_items:
+                    path = res_item.get("Path")
+                    self.__rename(path)    
+
 
     def __rename(self, media_path: str):
         logger.info(f"尝试更新文件名：{media_path}")

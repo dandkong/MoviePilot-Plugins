@@ -143,7 +143,12 @@ class RefreshRecentMeta(_PluginBase):
 
     def __refresh_emby(self) -> bool:
         end_date = self.__get_date(-int(self._offset_days))
-        url = f"[HOST]emby/Items?IncludeItemTypes=Episode&MinPremiereDate={end_date}&IsMissing=false&Recursive=true&api_key=[APIKEY]"
+        url_end_date = f"[HOST]emby/Items?IncludeItemTypes=Episode&MinPremiereDate={end_date}&IsMissing=false&Recursive=true&api_key=[APIKEY]"
+        # 有些没有日期的，也做个保底刷新
+        url_start_date = f"[HOST]emby/Items?IncludeItemTypes=Episode&MaxPremiereDate=1900-01-01&IsMissing=false&Recursive=true&api_key=[APIKEY]"
+        return self._refresh_by_url(url_end_date) and self._refresh_by_url(url_start_date)
+        
+    def _refresh_by_url(self, url):
         res_g = Emby().get_data(url)
         success = False
         if res_g:
