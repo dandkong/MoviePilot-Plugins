@@ -5,7 +5,7 @@
         "version": "1.0",
         "icon": "backup.png",
         "author": "dandkong",
-        "v2": "true",
+        "v2": true,
         "level": 1
     },
     "RenameRecentFile": {
@@ -14,7 +14,7 @@
         "version": "1.0",
         "icon": "backup.png",
         "author": "dandkong",
-        "v2": "true",
+        "v2": true,
         "level": 1
     },
     "RunCmd": {
@@ -23,7 +23,7 @@
         "version": "1.0",
         "icon": "backup.png",
         "author": "dandkong",
-        "v2": "true",
+        "v2": true,
         "level": 1
     }
 }
