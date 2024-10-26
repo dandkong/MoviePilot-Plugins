@@ -1,0 +1,10 @@
+{
+    "RefreshRecentMeta": {
+        "name": "刷新剧集元数据",
+        "description": "定时通知媒体库刷新最近发布剧集元数据",
+        "version": "1.0",
+        "icon": "backup.png",
+        "author": "dandkong",
+        "level": 1
+    }
+}
