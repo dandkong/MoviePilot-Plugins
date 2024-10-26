@@ -21,7 +21,7 @@ class RefreshRecentMeta(_PluginBase):
     # 插件图标
     plugin_icon = "backup.png"
     # 插件版本
-    plugin_version = "1.1"
+    plugin_version = "1.2"
     # 插件作者
     plugin_author = "dandkong"
     # 作者主页
@@ -135,7 +135,7 @@ class RefreshRecentMeta(_PluginBase):
         url_end_date = f"[HOST]emby/Items?IncludeItemTypes=Episode&MinPremiereDate={end_date}&IsMissing=false&Recursive=true&api_key=[APIKEY]"
         # 有些没有日期的，也做个保底刷新
         url_start_date = f"[HOST]emby/Items?IncludeItemTypes=Episode&MaxPremiereDate=1900-01-01&IsMissing=false&Recursive=true&api_key=[APIKEY]"
-        services = self.mediaserver_helper.get_services(name_filters=["Emby"])
+        services = self.mediaserver_helper.get_services(name_filters=["emby"])
         success = True
         for service_name, service in services:
             success = success and self._refresh_by_url(url_end_date, service) and self._refresh_by_url(url_start_date,
