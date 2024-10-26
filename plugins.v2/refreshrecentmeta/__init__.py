@@ -6,12 +6,11 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 from app.core.event import eventmanager, Event
 from app.core.config import settings
+from app.helper.mediaserver import MediaServerHelper
 from app.plugins import _PluginBase
 from typing import Any, List, Dict, Tuple, Optional
 from app.log import logger
 from app.schemas.types import EventType, NotificationType
-
-from app.modules.emby import Emby
 
 
 class RefreshRecentMeta(_PluginBase):
@@ -41,6 +40,8 @@ class RefreshRecentMeta(_PluginBase):
     _offset_days = "0"
     _onlyonce = False
     _notify = False
+    # 私有属性
+    mediaserver_helper = None
 
     # 定时器
     _scheduler: Optional[BackgroundScheduler] = None
@@ -48,7 +49,7 @@ class RefreshRecentMeta(_PluginBase):
     def init_plugin(self, config: dict = None):
         # 停止现有任务
         self.stop_service()
-
+        self.mediaserver_helper = MediaServerHelper()
         if config:
             self._enabled = config.get("enabled")
             self._cron = config.get("cron")
@@ -77,7 +78,7 @@ class RefreshRecentMeta(_PluginBase):
                     func=self.refresh_recent,
                     trigger="date",
                     run_date=datetime.now(tz=pytz.timezone(settings.TZ))
-                    + timedelta(seconds=3),
+                             + timedelta(seconds=3),
                     name="刷新剧集元数据",
                 )
                 # 关闭一次性开关
@@ -134,10 +135,15 @@ class RefreshRecentMeta(_PluginBase):
         url_end_date = f"[HOST]emby/Items?IncludeItemTypes=Episode&MinPremiereDate={end_date}&IsMissing=false&Recursive=true&api_key=[APIKEY]"
         # 有些没有日期的，也做个保底刷新
         url_start_date = f"[HOST]emby/Items?IncludeItemTypes=Episode&MaxPremiereDate=1900-01-01&IsMissing=false&Recursive=true&api_key=[APIKEY]"
-        return self._refresh_by_url(url_end_date) and self._refresh_by_url(url_start_date)
-        
-    def _refresh_by_url(self, url):
-        res_g = Emby().get_data(url)
+        services = self.mediaserver_helper.get_services(name_filters=["Emby"])
+        success = True
+        for service_name, service in services:
+            success = success and self._refresh_by_url(url_end_date, service) and self._refresh_by_url(url_start_date,
+                                                                                                       service)
+        return success
+
+    def _refresh_by_url(self, url, service):
+        res_g = service.get_data(url)
         success = False
         if res_g:
             success = True
@@ -149,7 +155,7 @@ class RefreshRecentMeta(_PluginBase):
                     name = res_item.get("Name")
                     # 刷新元数据
                     req_url = f"[HOST]emby/Items/{item_id}/Refresh?MetadataRefreshMode=FullRefresh&ImageRefreshMode=FullRefresh&ReplaceAllMetadata=true&ReplaceAllImages=true&api_key=[APIKEY]"
-                    res_pos = Emby().post_data(req_url)
+                    res_pos = service.post_data(req_url)
                     if res_pos:
                         logger.info(f"刷新元数据：{series_name} - {name}")
                     else:
