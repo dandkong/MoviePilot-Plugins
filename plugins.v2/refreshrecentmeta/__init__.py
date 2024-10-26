@@ -113,7 +113,7 @@ class RefreshRecentMeta(_PluginBase):
         logger.info(
             f"当前时间 {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))} 刷新剧集元数据"
         )
-        success = False
+        success = self.__refresh_emby()
         # 发送通知
         if self._notify:
             if success:
