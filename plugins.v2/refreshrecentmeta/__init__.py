@@ -114,7 +114,11 @@ class RefreshRecentMeta(_PluginBase):
         logger.info(
             f"当前时间 {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))} 刷新剧集元数据"
         )
-        success = self.__refresh_emby()
+        success = False
+        try:
+            success = self.__refresh_emby()
+        except Exception as e:
+            logger.error("__refresh_emby：%s" % str(e))
         # 发送通知
         if self._notify:
             if success:
@@ -137,7 +141,7 @@ class RefreshRecentMeta(_PluginBase):
         url_start_date = f"[HOST]emby/Items?IncludeItemTypes=Episode&MaxPremiereDate=1900-01-01&IsMissing=false&Recursive=true&api_key=[APIKEY]"
         services = self.mediaserver_helper.get_services(name_filters=["Emby"])
         success = True
-        for service_name, service in services:
+        for service_name, service in services.items():
             success = success and self._refresh_by_url(url_end_date, service.instance) and self._refresh_by_url(url_start_date,
                                                                                                        service.instance)
         return success
