@@ -123,13 +123,13 @@ class RefreshRecentMeta(_PluginBase):
         if self._notify:
             if success:
                 self.post_message(
-                    mtype=NotificationType.SiteMessage,
+                    mtype=NotificationType.Plugin,
                     title=f"【刷新最近{self._offset_days}天剧集元数据】",
                     text="刷新成功",
                 )
             else:
                 self.post_message(
-                    mtype=NotificationType.SiteMessage,
+                    mtype=NotificationType.Plugin,
                     title=f"【刷新最近{self._offset_days}天剧集元数据】",
                     text="刷新失败，请查看日志",
                 )
