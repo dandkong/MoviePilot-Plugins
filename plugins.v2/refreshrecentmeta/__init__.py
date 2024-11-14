@@ -139,7 +139,7 @@ class RefreshRecentMeta(_PluginBase):
         url_end_date = f"[HOST]emby/Items?IncludeItemTypes=Episode&MinPremiereDate={end_date}&IsMissing=false&Recursive=true&api_key=[APIKEY]"
         # 有些没有日期的，也做个保底刷新
         url_start_date = f"[HOST]emby/Items?IncludeItemTypes=Episode&MaxPremiereDate=1900-01-01&IsMissing=false&Recursive=true&api_key=[APIKEY]"
-        services = self.mediaserver_helper.get_services(name_filters=["Emby"])
+        services = self.mediaserver_helper.get_services(type_filter="emby")
         success = True
         for service_name, service in services.items():
             success = success and self._refresh_by_url(url_end_date, service.instance) and self._refresh_by_url(url_start_date,
